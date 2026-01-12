@@ -1,12 +1,11 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
-#include <limits>
 #include "tictactoe.h"
 
 using namespace std;
 
-// Отображение меню
+
 void showMenu() {
     vector<char> board = {'1', '2', '3', '4', '5', '6', '7', '8', '9'};
     char currentPlayer = 'X';
@@ -22,10 +21,15 @@ void showMenu() {
         cout << "Выберите пункт меню: ";
         
         int choice;
-        cin >> choice;
+        if (!(cin >> choice)) {
+            cin.clear();
+            while (cin.get() != '\n');
+            cout << "Неверный ввод!" << endl;
+            continue;
+        }
         
-        // Очистка буфера ввода
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+       
+        while (cin.get() != '\n');
         
         switch (choice) {
             case 1:
@@ -74,7 +78,7 @@ void showMenu() {
     }
 }
 
-// Отрисовка игрового поля
+
 void drawboard(const vector<char>& board) {
     cout << "\n";
     cout << " " << board[0] << " | " << board[1] << " | " << board[2] << "\n";
@@ -85,7 +89,7 @@ void drawboard(const vector<char>& board) {
     cout << "\n";
 }
 
-// Проверка победы
+
 bool checkwin(const vector<char>& board, char player) {
     return (
         (board[0] == player && board[1] == player && board[2] == player) ||
@@ -99,7 +103,7 @@ bool checkwin(const vector<char>& board, char player) {
     );
 }
 
-// Проверка ничьей
+
 bool checkdraw(const vector<char>& board) {
     for (char cell : board) {
         if (cell != 'X' && cell != 'O') {
@@ -109,23 +113,20 @@ bool checkdraw(const vector<char>& board) {
     return true;
 }
 
-// Начать новую игру
+
 void startNewGame() {
     vector<char> board = {'1', '2', '3', '4', '5', '6', '7', '8', '9'};
     char currentPlayer = 'X';
     cout << "Игрок X начинает первым.\n";
     playGameWithParams(board, currentPlayer);
 }
-
-// Перезапуск игры
 void restartGame(vector<char>& board, char& currentPlayer) {
-
-board = {'1', '2', '3', '4', '5', '6', '7', '8', '9'};
+    board = {'1', '2', '3', '4', '5', '6', '7', '8', '9'};
     currentPlayer = 'X';
     cout << "Игра перезапущена. Игрок X начинает первым.\n";
 }
 
-// Основная игровая функция (новая версия с параметрами)
+
 void playGameWithParams(vector<char>& board, char& currentPlayer) {
     bool gameEnded = false;
     
@@ -137,7 +138,7 @@ void playGameWithParams(vector<char>& board, char& currentPlayer) {
         
         if (!(cin >> move)) {
             cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            while (cin.get() != '\n');
             cout << "Неверный ввод!" << endl;
             continue;
         }
@@ -167,19 +168,19 @@ void playGameWithParams(vector<char>& board, char& currentPlayer) {
         }
     }
     
-    // После окончания игры возвращаемся в меню
+
     cout << "\nНажмите Enter для возврата в меню...";
     cin.ignore();
     cin.get();
 }
 
-// Старая функция для обратной совместимости
+
 int playGame() {
     startNewGame();
     return 0;
 }
 
-// Сохранение игры в файл
+
 bool saveGame(const vector<char>& board, char currentPlayer, const string& filename) {
     ofstream file(filename);
     if (!file.is_open()) {
@@ -187,20 +188,20 @@ bool saveGame(const vector<char>& board, char currentPlayer, const string& filen
         return false;
     }
     
-    // Сохраняем состояние поля
+    
     for (char cell : board) {
         file << cell << " ";
     }
     file << endl;
     
-    // Сохраняем текущего игрока
+    
     file << currentPlayer << endl;
     
     file.close();
     return true;
 }
 
-// Загрузка игры из файла
+
 bool loadGame(vector<char>& board, char& currentPlayer, const string& filename) {
     ifstream file(filename);
     if (!file.is_open()) {
@@ -208,7 +209,7 @@ bool loadGame(vector<char>& board, char& currentPlayer, const string& filename) 
         return false;
     }
     
-    // Загружаем состояние поля
+
     for (int i = 0; i < 9; i++) {
         if (!(file >> board[i])) {
             cout << "Ошибка: файл поврежден или имеет неверный формат.\n";
@@ -216,7 +217,7 @@ bool loadGame(vector<char>& board, char& currentPlayer, const string& filename) 
         }
     }
     
-    // Загружаем текущего игрока
+
     if (!(file >> currentPlayer)) {
         cout << "Ошибка: не удалось загрузить информацию о текущем игроке.\n";
         return false;
