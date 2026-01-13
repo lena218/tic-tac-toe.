@@ -14,7 +14,7 @@ void showMenu() {
     while (true) {
         cout << "\n=== КРЕСТИКИ-НОЛИКИ ===\n";
         cout << "1. Начать новую игру\n";
-        cout << "2. Начать сначала (перезапуск)\n";
+        cout << "2. Продолжить игру\n";
         cout << "3. Загрузить игру из файла\n";
         cout << "4. Сохранить игру в файл\n";
         cout << "5. Выйти из игры\n";
@@ -28,18 +28,16 @@ void showMenu() {
             continue;
         }
         
-       
         while (cin.get() != '\n');
         
         switch (choice) {
             case 1:
-                startNewGame();
                 gameInProgress = true;
+                startNewGame(board,currentPlayer,gameInProgress);
                 break;
             case 2:
                 if (gameInProgress) {
-                    restartGame(board, currentPlayer);
-                    playGameWithParams(board, currentPlayer);
+                    playGameWithParams(board,currentPlayer,gameInProgress);
                 } else {
                     cout << "Сначала начните игру (пункт 1)!\n";
                 }
@@ -52,7 +50,7 @@ void showMenu() {
                     if (loadGame(board, currentPlayer, filename)) {
                         cout << "Игра загружена успешно!\n";
                         gameInProgress = true;
-                        playGameWithParams(board, currentPlayer);
+                        playGameWithParams(board, currentPlayer,gameInProgress);
                     }
                 }
                 break;
@@ -114,25 +112,21 @@ bool checkdraw(const vector<char>& board) {
 }
 
 
-void startNewGame() {
-    vector<char> board = {'1', '2', '3', '4', '5', '6', '7', '8', '9'};
-    char currentPlayer = 'X';
-    cout << "Игрок X начинает первым.\n";
-    playGameWithParams(board, currentPlayer);
-}
-void restartGame(vector<char>& board, char& currentPlayer) {
+void startNewGame(vector<char>& board, char& currentPlayer, bool& gameInProgress) {
     board = {'1', '2', '3', '4', '5', '6', '7', '8', '9'};
     currentPlayer = 'X';
-    cout << "Игра перезапущена. Игрок X начинает первым.\n";
+    cout << "Игрок X начинает первым.\n";
+    playGameWithParams(board, currentPlayer, gameInProgress);
 }
 
 
-void playGameWithParams(vector<char>& board, char& currentPlayer) {
+
+void playGameWithParams(vector<char>& board, char& currentPlayer,bool& gameInProgress) {
     bool gameEnded = false;
     
     while (!gameEnded) {
         drawboard(board);
-        
+
         int move;
         cout << "Игрок " << currentPlayer << ", ваш ход: ";
         
@@ -143,6 +137,10 @@ void playGameWithParams(vector<char>& board, char& currentPlayer) {
             continue;
         }
         
+        if(move == -1){
+            cout << "Игра принудительно остановлена.\n";
+            break;
+        }
         if (move < 1 || move > 9) {
             cout << "Введите число от 1 до 9.\n";
             continue;
@@ -168,16 +166,12 @@ void playGameWithParams(vector<char>& board, char& currentPlayer) {
         }
     }
     
-
+    if(gameEnded){
+        gameInProgress = false;
+    }
     cout << "\nНажмите Enter для возврата в меню...";
     cin.ignore();
     cin.get();
-}
-
-
-int playGame() {
-    startNewGame();
-    return 0;
 }
 
 
